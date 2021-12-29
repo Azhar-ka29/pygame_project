@@ -1,6 +1,30 @@
 import pygame
 
 
+class Block(pygame.sprite.Sprite):
+    def __init__(self, path, x_pos, y_pos):
+        super().__init__()
+        self.image = pygame.image.load(path)
+        self.rect = self.image.get_rect(center=(x_pos, y_pos))
+
+
+class Player(Block):
+    def __init__(self, path, x_pos, y_pos, speed):
+        super().__init__(path, x_pos, y_pos)
+        self.speed = speed
+        self.movement = 0
+
+    def screen_constrain(self):
+        if self.rect.top <= 0:
+            self.rect.top = 0
+        if self.rect.bottom >= height:
+            self.rect.bottom = height
+
+    def update(self, ball_group):
+        self.rect.y += self.movement
+        self.screen_constrain()
+
+
 pygame.init()
 clock = pygame.time.Clock()
 
