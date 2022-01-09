@@ -1,16 +1,17 @@
 import pygame
+import random
 
 
 class Block(pygame.sprite.Sprite):
-    def __init__(self, path, x_pos, y_pos):
+    def __init__(self, path, x, y):
         super().__init__()
         self.image = pygame.image.load(path)
-        self.rect = self.image.get_rect(center=(x_pos, y_pos))
+        self.rect = self.image.get_rect(center=(x, y))
 
 
 class Player(Block):
-    def __init__(self, path, x_pos, y_pos, speed):
-        super().__init__(path, x_pos, y_pos)
+    def __init__(self, path, x, y, speed):
+        super().__init__(path, x, y)
         self.speed = speed
         self.movement = 0
 
@@ -23,6 +24,49 @@ class Player(Block):
     def update(self, ball_group):
         self.rect.y += self.movement
         self.screen_constrain()
+
+
+class Ball(Block):
+    def __init__(self, path, x, y, speed_x, speed_y, pad):
+        super().__init__(path, x, y)
+        self.speed_x = speed_x * random.choice((-1, 1))
+        self.speed_y = speed_y * random.choice((-1, 1))
+        self.pad = pad
+        self.active = False
+        self.time = 0
+
+    def restart(self):
+        self.active = False
+        self.speed_x *= random.choice((-1, 1))
+        self.speed_y *= random.choice((-1, 1))
+        self.time = pygame.time.get_ticks()
+        self.rect.center = (width / 2, height / 2)
+
+    def counter(self):
+        cur_time = pygame.time.get_ticks()
+
+        start_counter = 3
+
+        if (cur_time - self.time) <= 700:
+            start_counter = 3
+        if 700 < (cur_time - self.time) <= 1400:
+            start_counter = 2
+        if 1400 < (cur_time - self.time) <= 2100:
+            start_counter = 1
+        if (cur_time - self.time) >= 2100:
+            self.active = True
+
+    def actions(self):
+        pass
+
+    def update(self):
+        if self.active:
+            self.rect.x += self.speed_x
+            self.rect.y += self.speed_y
+            self.actions()
+
+        else:
+            self.counter()
 
 
 pygame.init()
