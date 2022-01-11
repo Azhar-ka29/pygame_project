@@ -58,7 +58,6 @@ class Ball(Block):
 
     def counter(self):
         cur_time = pygame.time.get_ticks()
-
         start_counter = 3
 
         if (cur_time - self.time) <= 700:
@@ -69,16 +68,32 @@ class Ball(Block):
             start_counter = 1
         if (cur_time - self.time) >= 2100:
             self.active = True
+        time_counter = font.render(str(start_counter), True, black_color)
+        time_counter_rect = time_counter.get_rect(center=(width / 2, height / 2 + 50))
+        pygame.draw.rect(screen, bg_color, time_counter_rect)
+        screen.blit(time_counter, time_counter_rect)
 
     def actions(self):
-        pass
+        if self.rect.top <= 0 or self.rect.bottom >= height:
+            self.speed_y *= -1
+        if pygame.sprite.spritecollide(self, self.pad, False):
+            collision_paddle = pygame.sprite.spritecollide(self, self.pad, False)[0].rect
+            if abs(self.rect.right - collision_paddle.left) < 10 and self.speed_x > 0:
+                self.speed_x *= -1
+            if abs(self.rect.left - collision_paddle.right) < 10 and self.speed_x < 0:
+                self.speed_x *= -1
+            if abs(self.rect.top - collision_paddle.bottom) < 10 and self.speed_y < 0:
+                self.rect.top = collision_paddle.bottom
+                self.speed_y *= -1
+            if abs(self.rect.bottom - collision_paddle.top) < 10 and self.speed_y > 0:
+                self.rect.bottom = collision_paddle.top
+                self.speed_y *= -1
 
     def update(self):
         if self.active:
             self.rect.x += self.speed_x
             self.rect.y += self.speed_y
             self.actions()
-
         else:
             self.counter()
 
@@ -91,7 +106,8 @@ screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption('Ping Pong')
 
 bg_color = pygame.Color('#2F373F')
-accent_color = (27, 35, 43)
+black_color = pygame.Color('black')
+font = pygame.font.Font('freesansbold.ttf', 35)
 middle_strip = pygame.Rect(width / 2 - 2, 0, 4, height)
 
 running = True
@@ -102,7 +118,7 @@ while running:
             running = False
 
     screen.fill(bg_color)
-    pygame.draw.rect(screen, accent_color, middle_strip)
+    pygame.draw.rect(screen, black_color, middle_strip)
     pygame.display.flip()
     clock.tick(120)
 
