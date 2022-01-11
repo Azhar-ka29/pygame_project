@@ -1,11 +1,25 @@
 import pygame
 import random
+import os
+
+
+def load_image(name, colorkey=None):
+    filename = os.path.join('data', name)
+    image = pygame.image.load(filename).convert()
+    if colorkey is not None:
+        image = image.convert()
+        if colorkey == -1:
+            colorkey = image.get_at((0, 0))
+        image.set_colorkey(colorkey)
+    else:
+        image = image.convert_alpha()
+    return image
 
 
 class Block(pygame.sprite.Sprite):
     def __init__(self, path, x, y):
         super().__init__()
-        self.image = pygame.image.load(path)
+        self.image = load_image(path)
         self.rect = self.image.get_rect(center=(x, y))
 
 
