@@ -1,6 +1,7 @@
 import pygame
 import random
 import os
+import sys
 
 
 def load_image(name, colorkey=None):
@@ -14,6 +15,44 @@ def load_image(name, colorkey=None):
     else:
         image = image.convert_alpha()
     return image
+
+
+FPS = 50
+
+
+def terminate():
+    pygame.quit()
+    sys.exit()
+
+
+def start_screen():
+    intro_text = ["Игра 'Ping Pong'", "",
+                  "Правила игры",
+                  "После подачи мяча, нужно отбить его ракеткой",
+                  "главная задача: не пропустить мяч"]
+
+    fon = pygame.transform.scale(load_image('fon.jpg'), (width, height))
+    screen.blit(fon, (0, 0))
+    font = pygame.font.Font(None, 30)
+    text_coord = 50
+    for line in intro_text:
+        string_rendered = font.render(line, 1, pygame.Color('white'))
+        intro_rect = string_rendered.get_rect()
+        text_coord += 10
+        intro_rect.top = text_coord
+        intro_rect.x = 10
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.KEYDOWN or \
+                    event.type == pygame.MOUSEBUTTONDOWN:
+                return
+        pygame.display.flip()
+        clock.tick(FPS)
 
 
 class Block(pygame.sprite.Sprite):
@@ -129,6 +168,8 @@ bg_color = pygame.Color('#2F373F')
 grey_color = pygame.Color('grey')
 font = pygame.font.Font('freesansbold.ttf', 35)
 middle_strip = pygame.Rect(width / 2 - 2, 0, 4, height)
+
+start_screen()
 
 running = True
 
