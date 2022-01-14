@@ -50,7 +50,7 @@ def start_screen():
                 terminate()
             elif event.type == pygame.KEYDOWN or \
                     event.type == pygame.MOUSEBUTTONDOWN:
-                return
+                return  # начинаем игру
         pygame.display.flip()
         clock.tick(FPS)
 
@@ -99,13 +99,13 @@ class Ball(Block):
         cur_time = pygame.time.get_ticks()
         start_counter = 3
 
-        if (cur_time - self.time) <= 700:
+        if (cur_time - self.time) <= 1400:
             start_counter = 3
-        if 700 < (cur_time - self.time) <= 1400:
-            start_counter = 2
         if 1400 < (cur_time - self.time) <= 2100:
+            start_counter = 2
+        if 2100 < (cur_time - self.time) <= 2800:
             start_counter = 1
-        if (cur_time - self.time) >= 2100:
+        if (cur_time - self.time) >= 2800:
             self.active = True
         time_counter = font.render(str(start_counter), True, grey_color)
         time_counter_rect = time_counter.get_rect(center=(width / 2, height / 2 + 50))
@@ -157,6 +157,21 @@ class Computer(Block):
         self.screen_constrain()
 
 
+class GameRunner:
+    def __init__(self, ball_group, paddle_group):
+        self.player_score = 0
+        self.computer_score = 0
+        self.ball_group = ball_group
+        self.paddle_group = paddle_group
+
+    def run_game(self):
+        self.paddle_group.draw(screen)
+        self.ball_group.draw(screen)
+
+        self.paddle_group.update(self.ball_group)
+        self.ball_group.update()
+
+
 pygame.init()
 clock = pygame.time.Clock()
 
@@ -166,10 +181,22 @@ pygame.display.set_caption('Ping Pong')
 
 bg_color = pygame.Color('#2F373F')
 grey_color = pygame.Color('grey')
-font = pygame.font.Font('freesansbold.ttf', 35)
+font = pygame.font.Font(None, 50)
 middle_strip = pygame.Rect(width / 2 - 2, 0, 4, height)
 
 start_screen()
+
+player = Player('Paddle.png', width - 20, height / 2, 5)
+computer = Computer('Paddle.png', 20, width / 2, 5)
+paddle_group = pygame.sprite.Group()
+paddle_group.add(player)
+paddle_group.add(computer)
+
+ball = Ball('Ball.png', width / 2, height / 2, 4, 4, paddle_group)
+ball_group = pygame.sprite.GroupSingle()
+ball_group.add(ball)
+
+game_manager = GameRunner(ball_group, paddle_group)
 
 running = True
 
@@ -177,9 +204,21 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:
+                player.movement -= player.speed
+            if event.key == pygame.K_DOWN:
+                player.movement += player.speed
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_UP:
+                player.movement += player.speed
+            if event.key == pygame.K_DOWN:
+                player.movement -= player.speed
 
     screen.fill(pygame.Color('white'))
     pygame.draw.rect(screen, grey_color, middle_strip)
+
+    game_manager.run_game()
 
     pygame.display.flip()
     clock.tick(120)
