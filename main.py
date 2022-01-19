@@ -26,12 +26,25 @@ def terminate():
 
 
 def start_screen():
-    intro_text = ["Игра 'Ping Pong'", "",
+    intro_text = [" ",
+                  " ",
+                  " ",
+                  " ",
+                  " ",
+                  " ",
+                  " ",
+                  " ",
+                  " ",
+                  " ",
+                  " ",
+                  " ",
+                  " ",
+                  " ",
                   "Правила игры",
                   "После подачи мяча, нужно отбить его ракеткой",
                   "главная задача: не пропустить мяч"]
 
-    fon = pygame.transform.scale(load_image('fon.jpg'), (width, height))
+    fon = pygame.transform.scale(load_image('fon1.jpg'), (width, height))
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 30)
     text_coord = 50
@@ -50,7 +63,7 @@ def start_screen():
                 terminate()
             elif event.type == pygame.KEYDOWN or \
                     event.type == pygame.MOUSEBUTTONDOWN:
-                return  # начинаем игру
+                return
         pygame.display.flip()
         clock.tick(FPS)
 
@@ -196,7 +209,7 @@ ball = Ball('Ball.png', width / 2, height / 2, 4, 4, paddle_group)
 ball_group = pygame.sprite.GroupSingle()
 ball_group.add(ball)
 
-game_manager = GameRunner(ball_group, paddle_group)
+game_runner = GameRunner(ball_group, paddle_group)
 
 running = True
 
@@ -217,9 +230,7 @@ while running:
 
     screen.fill(pygame.Color('white'))
     pygame.draw.rect(screen, grey_color, middle_strip)
-
-    game_manager.run_game()
-
+    game_runner.run_game()
     pygame.display.flip()
     clock.tick(120)
 
