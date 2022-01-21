@@ -2,6 +2,7 @@ import pygame
 import random
 import os
 import sys
+import time
 
 
 def load_image(name, colorkey=None):
@@ -176,6 +177,8 @@ class GameRunner:
         self.computer_score = 0
         self.ball_group = ball_group
         self.paddle_group = paddle_group
+        self.player_win = False
+        self.computer_win = False
 
     def run_game(self):
         self.paddle_group.draw(screen)
@@ -183,6 +186,51 @@ class GameRunner:
 
         self.paddle_group.update(self.ball_group)
         self.ball_group.update()
+        self.reset_ball()
+        self.score()
+        self.check_score()
+
+    def reset_ball(self):
+        if self.ball_group.sprite.rect.right >= width:
+            self.computer_score += 1
+            self.ball_group.sprite.restart()
+
+        if self.ball_group.sprite.rect.left <= 0:
+            self.player_score += 1
+            self.ball_group.sprite.restart()
+
+    def score(self):
+        player_score = font.render(str(self.player_score), True, grey_color)
+        computer_score = font.render(str(self.computer_score), True, grey_color)
+
+        player_score_rect = player_score.get_rect(midleft=(width / 2 + 40, 25))
+        computer_score_rect = computer_score.get_rect(midright=(width / 2 - 40, 25))
+
+        screen.blit(player_score, player_score_rect)
+        screen.blit(computer_score, computer_score_rect)
+
+    def winner(self):
+        go_font = pygame.font.SysFont(None, 72)
+        if self.player_win is True:
+            win_surf = go_font.render('Player won!', True, pygame.Color('red'))
+
+        else:
+            win_surf = go_font.render('Computer won!', True, pygame.Color('red'))
+
+        win_rect = win_surf.get_rect()
+        win_rect.midtop = (400, 30)
+        screen.blit(win_surf, win_rect)
+        pygame.display.flip()
+        time.sleep(4)
+        terminate()
+
+    def check_score(self):
+        if self.player_score == 7:
+            self.player_win = True
+            self.winner()
+        elif self.computer_score == 7:
+            self.computer_win = True
+            self.winner()
 
 
 pygame.init()
@@ -232,6 +280,6 @@ while running:
     pygame.draw.rect(screen, grey_color, middle_strip)
     game_runner.run_game()
     pygame.display.flip()
-    clock.tick(120)
+    clock.tick(130)
 
 pygame.quit()
